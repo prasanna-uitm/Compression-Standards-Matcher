@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compression Standards Matcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Custom animation for the feedback boxes */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .feedback-animate {
+            animation: slideDown 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen pb-12">
+
+    <!-- Header Section -->
+    <header class="bg-indigo-600 text-white shadow-md py-8 px-4 sm:px-6 lg:px-8 mb-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl sm:text-4xl font-bold mb-2">Media Formats & Compression</h1>
+            <p class="text-indigo-100 text-lg sm:text-xl">
+                <strong>Learning Outcome:</strong> Identify common compression standards and select the one that best suits a specific media type and its intended use.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
+            <p class="text-gray-600 mb-6">
+                Read each scenario below and select the most appropriate file format from the dropdown menu. You will receive immediate feedback on your choice!
+            </p>
+            
+            <!-- Scenarios Container -->
+            <div id="scenarios-container" class="space-y-8">
+                <!-- Javascript will populate this -->
+            </div>
+            
+            <!-- Reset Button -->
+            <div class="mt-10 text-center">
+                <button id="reset-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50">
+                    Reset All Exercises
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Data Structure for the Exercises
+        const formatOptions = ["Select a format...", "JPEG", "PNG", "GIF", "MP4", "MP3", "WAV", "ZIP", "SVG", "RAW", "PDF"];
+        
+        const scenarios = [
+            {
+                id: "scenario-1",
+                title: "1. Full-Color Landscape Photo",
+                description: "You are uploading a large, full-color landscape photograph to a travel blog. It needs to load quickly on mobile devices without obvious, major quality loss.",
+                correctFormat: "JPEG",
+                feedback: {
+                    "JPEG": "Correct! JPEG uses lossy compression specifically designed for complex, full-color photographs. It reduces file sizes significantly while keeping visual quality acceptable.",
+                    "PNG": "Incorrect. PNG uses lossless compression. While it would look perfect, the file size for a full-color photo would be massive, causing slow page load times.",
+                    "RAW": "Incorrect. RAW is uncompressed camera data, resulting in massive files not supported directly by web browsers.",
+                    "default": "Incorrect. This format is not suited for standard web photographs."
+                }
+            },
+            {
+                id: "scenario-2",
+                title: "2. The Transparent Web Logo",
+                description: "You need a high-quality company logo with smooth edges and a transparent background to overlay on a colorful website header.",
+                correctFormat: "PNG",
+                feedback: {
+                    "PNG": "Correct! PNG supports lossless compression and full alpha-channel transparency, making it perfect for crisp logos without blocky backgrounds.",
+                    "JPEG": "Incorrect. JPEG is a lossy format that does NOT support transparency. Your logo would end up with a solid white (or colored) background block.",
+                    "SVG": "While SVG is great for logos, PNG is the standard raster format best suited for this scenario if vector graphics aren't explicitly requested.",
+                    "default": "Incorrect. This format is for audio, video, or documents, not static transparent images."
+                }
+            },
+            {
+                id: "scenario-3",
+                title: "3. Short Looping Meme",
+                description: "You want to create a short, silent animation to use as an auto-looping reaction meme on a classic internet forum.",
+                correctFormat: "GIF",
+                feedback: {
+                    "GIF": "Correct! GIF is designed to support simple, silent animations. It's universally supported by all web browsers and classic forums for auto-looping memes.",
+                    "JPEG": "Incorrect. JPEG does not support animation. It can only display a single, static frame.",
+                    "MP4": "Incorrect. While MP4 is efficient for video, classic forums often require simple image formats for embedded auto-looping memes, making GIF the traditional standard.",
+                    "default": "Incorrect. This format is not suited for silent web animations."
+                }
+            },
+            {
+                id: "scenario-4",
+                title: "4. HD YouTube Video",
+                description: "You have finished editing a 10-minute High-Definition (HD) video and need to upload it to YouTube.",
+                correctFormat: "MP4",
+                feedback: {
+                    "MP4": "Correct! MP4 is the industry standard container for web video. It offers excellent compression (often H.264/H.265), balancing high-definition visual quality with reasonable upload sizes.",
+                    "GIF": "Incorrect. A 10-minute HD video exported as a GIF would result in a massive file size, horrible visual quality, and no sound.",
+                    "MP3": "Incorrect. MP3 is an audio-only format and cannot contain your video footage.",
+                    "default": "Incorrect. This is not a video container format."
+                }
+            },
+            {
+                id: "scenario-5",
+                title: "5. Podcast Episode Streaming",
+                description: "You are hosting a 60-minute spoken-word podcast episode that users will stream directly from your website on their mobile data.",
+                correctFormat: "MP3",
+                feedback: {
+                    "MP3": "Correct! MP3 uses lossy compression to significantly shrink audio file sizes, making it the perfect, widely-supported standard for streaming podcasts over mobile networks.",
+                    "WAV": "Incorrect. WAV is an uncompressed audio format. A 60-minute WAV file would be hundreds of megabytes, which is terrible for mobile streaming.",
+                    "MP4": "Incorrect. MP4 is primarily a video container. While it can hold audio, MP3 is the direct standard for pure audio streaming.",
+                    "default": "Incorrect. This format is meant for images, video, or documents, not streaming audio."
+                }
+            },
+            {
+                id: "scenario-6",
+                title: "6. Master Vocal Audio Track",
+                description: "You are archiving the final, pristine vocal take in a professional music studio. Absolutely no audio data or quality can be lost for future editing.",
+                correctFormat: "WAV",
+                feedback: {
+                    "WAV": "Correct! WAV is an uncompressed, lossless audio format. It retains 100% of the original audio data recorded in the studio, which is crucial for professional mixing.",
+                    "MP3": "Incorrect. MP3 uses lossy compression and permanently discards audio data to save space. You should never use it for a master studio archive.",
+                    "default": "Incorrect. This format is not for high-fidelity, uncompressed audio archiving."
+                }
+            },
+            {
+                id: "scenario-7",
+                title: "7. Bundling Files for Email",
+                description: "You need to send an email containing 25 text documents and Excel spreadsheets to a client, but your email client complains about too many attachments.",
+                correctFormat: "ZIP",
+                feedback: {
+                    "ZIP": "Correct! ZIP is a lossless data compression format that bundles multiple files into a single, smaller archive file, perfect for bypassing email attachment limits.",
+                    "PDF": "Incorrect. PDF is a document presentation format. While you can technically embed files in a PDF, it's not a general-purpose file archiver like ZIP.",
+                    "default": "Incorrect. This format handles specific media types; it is not an archive format for bundling multiple disparate files."
+                }
+            },
+            {
+                id: "scenario-8",
+                title: "8. Scalable Website Graph",
+                description: "You are designing a statistical graph for a website. It must stay perfectly sharp whether viewed on a tiny smartphone or a massive 4K monitor.",
+                correctFormat: "SVG",
+                feedback: {
+                    "SVG": "Correct! SVG (Scalable Vector Graphics) uses mathematical equations instead of pixels. This means it can scale infinitely without ever losing quality or becoming blurry.",
+                    "JPEG": "Incorrect. JPEG is a raster format (made of pixels). If you stretch a JPEG to fit a large monitor, it will become blurry and pixelated.",
+                    "PNG": "Incorrect. Like JPEG, PNG is pixel-based and will lose crispness when scaled up significantly.",
+                    "default": "Incorrect. This format does not support resolution-independent vector graphics."
+                }
+            },
+            {
+                id: "scenario-9",
+                title: "9. Unprocessed DSLR Camera Data",
+                description: "You are a professional photographer. You need the maximum possible color and light data from your camera sensor to heavily edit the exposure later.",
+                correctFormat: "RAW",
+                feedback: {
+                    "RAW": "Correct! RAW files contain the unprocessed, uncompressed data directly from the camera sensor, giving you maximum flexibility for recovering highlights and shadows in post-production.",
+                    "JPEG": "Incorrect. When a camera saves a JPEG, it applies irreversible lossy compression, contrast, and color adjustments, throwing away the data you need for heavy editing.",
+                    "PNG": "Incorrect. Cameras do not shoot in PNG format naturally, and it lacks the extended dynamic range data of a RAW file.",
+                    "default": "Incorrect. This is not a camera sensor data format."
+                }
+            },
+            {
+                id: "scenario-10",
+                title: "10. Official Company Handbook",
+                description: "You need to distribute the official employee handbook. The formatting, fonts, and layout must look exactly the same on every employee's device, and it shouldn't be easily editable.",
+                correctFormat: "PDF",
+                feedback: {
+                    "PDF": "Correct! PDF (Portable Document Format) is designed to encapsulate text, fonts, and images into a fixed-layout document that looks identical on any operating system or device.",
+                    "ZIP": "Incorrect. ZIP just compresses files; it doesn't format or present a document.",
+                    "JPEG": "Incorrect. While you could technically make each page a JPEG image, it would be a massive file, unsearchable, and terrible for reading text.",
+                    "default": "Incorrect. This format is for media or raw data, not for locked document presentation."
+                }
+            }
+        ];
+
+        const container = document.getElementById('scenarios-container');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Render the UI
+        function renderScenarios() {
+            container.innerHTML = ''; // Clear container
+
+            scenarios.forEach((scenario, index) => {
+                // Create Scenario Card
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 rounded-xl p-5 sm:p-6 border border-gray-200 transition-all duration-300';
+                card.id = `card-${scenario.id}`;
+
+                // Title and Description
+                const title = document.createElement('h2');
+                title.className = 'text-xl font-bold text-gray-800 mb-2';
+                title.textContent = scenario.title;
+
+                const desc = document.createElement('p');
+                desc.className = 'text-gray-600 mb-4 leading-relaxed';
+                desc.textContent = scenario.description;
+
+                // Controls Wrapper
+                const controls = document.createElement('div');
+                controls.className = 'flex flex-col sm:flex-row items-start sm:items-center gap-4';
+
+                const label = document.createElement('label');
+                label.className = 'font-medium text-sm text-gray-700';
+                label.htmlFor = `select-${scenario.id}`;
+                label.textContent = 'Choose Format:';
+
+                // Select Dropdown
+                const select = document.createElement('select');
+                select.id = `select-${scenario.id}`;
+                select.className = 'block w-full sm:w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white border shadow-sm cursor-pointer';
+                
+                formatOptions.forEach(opt => {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = opt;
+                    optionEl.textContent = opt;
+                    if(opt === "Select a format...") {
+                        optionEl.disabled = true;
+                        optionEl.selected = true;
+                        optionEl.value = "";
+                    }
+                    select.appendChild(optionEl);
+                });
+
+                // Feedback Box (Hidden initially)
+                const feedbackBox = document.createElement('div');
+                feedbackBox.id = `feedback-${scenario.id}`;
+                feedbackBox.className = 'hidden mt-4 p-4 rounded-lg text-sm md:text-base border feedback-animate';
+
+                // Event Listener for Selection
+                select.addEventListener('change', (e) => {
+                    const selectedValue = e.target.value;
+                    handleSelection(scenario, selectedValue, feedbackBox, card);
+                });
+
+                // Assemble the card
+                controls.appendChild(label);
+                controls.appendChild(select);
+                card.appendChild(title);
+                card.appendChild(desc);
+                card.appendChild(controls);
+                card.appendChild(feedbackBox);
+                container.appendChild(card);
+            });
+        }
+
+        // Logic for evaluating the answer
+        function handleSelection(scenario, selectedValue, feedbackBox, cardElement) {
+            if (!selectedValue) return;
+
+            // Reset animation by triggering reflow
+            feedbackBox.classList.remove('feedback-animate');
+            void feedbackBox.offsetWidth; 
+            feedbackBox.classList.add('feedback-animate');
+            feedbackBox.classList.remove('hidden');
+
+            const isCorrect = selectedValue === scenario.correctFormat;
+            
+            // Determine the specific feedback text
+            let feedbackText = "";
+            if (scenario.feedback[selectedValue]) {
+                feedbackText = scenario.feedback[selectedValue];
+            } else {
+                feedbackText = scenario.feedback["default"];
+            }
+
+            // Apply Styles based on Correct/Incorrect
+            if (isCorrect) {
+                feedbackBox.className = 'mt-4 p-4 rounded-lg text-sm md:text-base border feedback-animate bg-green-50 border-green-200 text-green-800 shadow-sm';
+                cardElement.classList.add('ring-2', 'ring-green-400', 'border-transparent');
+                cardElement.classList.remove('ring-2', 'ring-red-400');
+                
+                // Add Checkmark icon HTML
+                feedbackBox.innerHTML = `
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <strong>Correct Match!</strong><br/>
+                            ${feedbackText}
+                        </div>
+                    </div>
+                `;
+            } else {
+                feedbackBox.className = 'mt-4 p-4 rounded-lg text-sm md:text-base border feedback-animate bg-red-50 border-red-200 text-red-800 shadow-sm';
+                cardElement.classList.add('ring-2', 'ring-red-400', 'border-transparent');
+                cardElement.classList.remove('ring-2', 'ring-green-400');
+                
+                // Add X icon HTML
+                feedbackBox.innerHTML = `
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-red-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <strong>Incorrect Format.</strong><br/>
+                            ${feedbackText}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Reset functionality
+        resetBtn.addEventListener('click', () => {
+            renderScenarios();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Initial Render
+        renderScenarios();
+
+    </script>
+</body>
+</html>
